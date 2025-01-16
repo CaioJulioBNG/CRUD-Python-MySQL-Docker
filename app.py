@@ -54,7 +54,26 @@ def read():
         if conexao.is_connected():
             conexao.close()
 
+def update():
+    print("Selecionado: Atualizar")
+    id_usuario = input("Digite o ID do usuário que deseja atualizar: ")
+    name = input("Digite o novo nome: ")
+    email = input("Digite o novo email: ")
+
+    try:
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+        cursor.execute("UPDATE cadastro SET nome = %s, email = %s WHERE id = %s", (name, email, id_usuario))
+        conexao.commit()
+        print("Registro Atualizado com Sucesso !")
+
+    except mysql.connector.Error as bode:
+        print(f"Deu Ruim ! {bode}")
+
+    finally:
+        if conexao.is_connected():
+            conexao.close()
 
 if __name__ == "__main__":
-    read()
+    update()
     
