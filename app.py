@@ -17,24 +17,44 @@ def conectar_banco():
 def create():
     print("Selecionado: Criar Registro!")
 
-    name = input("Digite o seu Nome")
-    email = input("Digite seu Email:")
-    pas = input("Digite a sua Senha:")
+    name = input("Digite o seu Nome")           # Pedindo nome ao usuário
+    email = input("Digite seu Email:")          # Pedindo email ao usuário  
+    pas = input("Digite a sua Senha:")          # Pedindo a senha ao usuário
+
+    try:
+        conexao = conectar_banco()             # Iniciando conexão
+        cursor = conexao.cursor()              # Criando o 'Manipulador' do Banco de Dados
+        cursor.execute("INSERT INTO cadastro VALUES (null, %s, %s, %s)",(name,email,pas)) # Executando Comando
+        conexao.commit()                       # Confirma as alterações do Banco de Dados
+        print("Registro Criado com sucesso!")
+    
+    except mysql.connector.Error as bode:      # Except para mostrar Erro do MySql
+        print(f"Deu ruim! {bode}")
+
+    finally:                                    # Fechando a Conexão com o Banco
+        if conexao.is_connected():
+            conexao.close() 
+
+def read():
+    print("Selecionado: Buscar Registros!")
 
     try:
         conexao = conectar_banco()
         cursor = conexao.cursor()
-        cursor.execute("INSERT INTO cadastro VALUES (null, %s, %s, %s)",(name,email,pas))
-        conexao.commit()
-        print("Registro Criado com sucesso!")
-    
-    except mysql.connector.Error as ruim:
-        print(f"Deu ruim! {ruim}")
+        cursor.execute("SELECT * FROM cadastro")
+        cadastros = cursor.fetchall()     # Retorna o resultado da pesquisa como uma lista de tuplas
+        print("\n Veja os Registros Encontrados!")
+        for i in cadastros:               # Percorre cada tupla dentro da lista, cada i é uma TUPLA
+            print(f"Registro Número: {i[0]}, Nome: {i[1]}, email: {i[2]}")
+
+    except mysql.connector.Error as bode:
+        print(f"Deu Ruim! {bode}")
 
     finally:
         if conexao.is_connected():
             conexao.close()
 
+
 if __name__ == "__main__":
-    create()
+    read()
     
