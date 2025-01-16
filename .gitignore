@@ -1,0 +1,20 @@
+# Arquivos de configuração
+.env
+
+# Pastas do sistema e do editor
+.vscode/
+.idea/
+
+# Cache e arquivos temporários do Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ambiente virtual
+venv/
+
+# Logs
+*.log
+
+# Arquivos gerados pelo Docker
+docker-compose.override.yml
