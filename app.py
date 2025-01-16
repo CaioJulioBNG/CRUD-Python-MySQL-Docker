@@ -91,7 +91,34 @@ def delete():
         if conexao.is_connected():
             conexao.close()
 
+def menu():
+    print("\nBem Vindo ao CRUD")
+    while True:
+
+        print("\nO que deseja fazer ?")
+        print("\n(1) Criar Registro")
+        print("(2) Listar Registros")
+        print("(3) Atualizar Registro")
+        print("(4) Excluir Registro")
+        print("(5) Sair")
+
+        decisao = input("")
+
+        if decisao == "1":
+            create()
+        elif decisao == "2":
+            read()
+        elif decisao == "3":
+            update()
+        elif decisao == "4":
+            delete()
+        elif decisao == "5":
+            print("Fechando programa ...")
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
 
 if __name__ == "__main__":
-    delete()
+    menu()
     
