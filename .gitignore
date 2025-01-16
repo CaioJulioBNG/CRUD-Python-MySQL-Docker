@@ -1,6 +1,9 @@
 # Arquivos de configuração
 .env
 
+# [Provisório] Database Config
+.db
+
 # Pastas do sistema e do editor
 .vscode/
 .idea/
