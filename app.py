@@ -74,6 +74,24 @@ def update():
         if conexao.is_connected():
             conexao.close()
 
+def delete():
+    id_usuario = input("Digite o ID do usuário que deseja excluir: ")
+
+    try:
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+        cursor.execute("DELETE FROM cadastro WHERE id = %s", (id_usuario,)) # LEmbrar da ','
+        conexao.commit()
+        print("Registro Excluído com Sucesso!")
+
+    except mysql.connector.Error as bode:
+        print(f"Deu Ruim! {bode}")
+
+    finally:
+        if conexao.is_connected():
+            conexao.close()
+
+
 if __name__ == "__main__":
-    update()
+    delete()
     
