@@ -1,6 +1,52 @@
 import mysql.connector
 from dotenv import load_dotenv
 import os
+import bcrypt
+import re
+
+def encriptize(password):                  # Função para encriptar a senha
+    salt = bcrypt.gensalt()
+    hash_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hash_password
+
+def check_passw(hashed_password, user_password):
+    if isinstance(hashed_password, str):
+        hashed_password = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(user_password.encode('utf-8'), hashed_password)
+
+def validar_nome(name):
+    name_regex = r'^[A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+)*$'
+    check_regex = bool(re.match(name_regex, name))
+    return check_regex
+
+def validar_email(email):
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    check_regex = bool(re.match(email_regex, email))
+    return check_regex
+
+def validar_password(passw):
+    passw_regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    check_regex = bool(re.match(passw_regex, passw))
+    return check_regex
+
+def validar_duplicagem(name):
+
+    try:
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+        cursor.execute("SELECT * FROM cadastro WHERE nome = %s",(name,))
+        resposta = cursor.fetchall()
+        if resposta:
+            return False
+        else:
+            return True
+        
+    except mysql.connector.Error as bode:
+        print(f"Deu Ruim! {bode}")
+
+    finally:
+        if conexao.is_connected():
+            conexao.close()
 
 
 def conectar_banco():
@@ -17,14 +63,37 @@ def conectar_banco():
 def create():
     print("Selecionado: Criar Registro!")
 
-    name = input("Digite o seu Nome")           # Pedindo nome ao usuário
-    email = input("Digite seu Email:")          # Pedindo email ao usuário  
-    pas = input("Digite a sua Senha:")          # Pedindo a senha ao usuário
+    while True:
+        name = input("Digite o seu Nome:").strip()
+
+        if not validar_nome(name):
+            print("Nome inválido. Use apenas letras e espaços.")
+            continue
+        
+        if not validar_duplicagem(name):
+            print("Nome já cadastrado no sistema. Por favor use outro")
+            continue
+
+        break
+
+    while True:
+        email = input("Digite o seu Email")
+        if validar_email(email):
+            break
+        print("Email inválido, Digite no formato (aaaaa@aaaaa.aaa)")
+
+    while True:
+        passw = input("Digite a sua Senha:")
+        if validar_password(passw):
+            pass_encript = encriptize(passw)
+            break
+        print("Senha Inválida! Coloque ao menos uma: letra minúscula, letra maiúscula, número, caractere especial, mínimo 8 caracteres")
+
 
     try:
         conexao = conectar_banco()             # Iniciando conexão
         cursor = conexao.cursor()              # Criando o 'Manipulador' do Banco de Dados
-        cursor.execute("INSERT INTO cadastro VALUES (null, %s, %s, %s)",(name,email,pas)) # Executando Comando
+        cursor.execute("INSERT INTO cadastro VALUES (null, %s, %s, %s)",(name,email,pass_encript)) # Executando Comando
         conexao.commit()                       # Confirma as alterações do Banco de Dados
         print("Registro Criado com sucesso!")
     
@@ -91,6 +160,35 @@ def delete():
         if conexao.is_connected():
             conexao.close()
 
+def login():
+    print("Selecionado: Login")
+
+    name = input("Digite o seu nome:")
+    passw = input("Digite sua senha")
+
+    try:
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+        cursor.execute("SELECT * FROM cadastro WHERE nome = %s", (name,))
+        resultado = cursor.fetchall()
+        if resultado:
+            passw_db = resultado[0][3]
+            if check_passw(passw_db, passw):
+                print("Login Realizado com Sucesso!")
+            else:
+                print("Senha Incorreta! Tente Novamente!")
+        else:
+            print("Usuário não encontrado! Tente Novamente !")
+
+    except mysql.connector.Error as bode:
+        print(f"Deu Ruim! {bode}")
+
+    finally:
+        if conexao.is_connected():
+            conexao.close()
+
+
+
 def menu():
     print("\nBem Vindo ao CRUD")
     while True:
@@ -101,6 +199,7 @@ def menu():
         print("(3) Atualizar Registro")
         print("(4) Excluir Registro")
         print("(5) Sair")
+        print("(6) Realizar Login")
 
         decisao = input("")
 
@@ -115,6 +214,8 @@ def menu():
         elif decisao == "5":
             print("Fechando programa ...")
             break
+        elif decisao == "6":
+            login()
         else:
             print("Opção inválida. Tente novamente.")
 
