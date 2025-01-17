@@ -1,6 +1,6 @@
  # CRUD com Python, MySQL e Docker
 
- ![Tela Inicial](img.ilustracao1.png)
+ ![Tela Inicial](img/ilustracao1.png)
 
  Este é um projeto simples desenvolvido com **Python**, **MySql** e **Docker**, explorando boas práticas como validações com **Regex** e criptografia de senhas com **bcrypt**.
 
